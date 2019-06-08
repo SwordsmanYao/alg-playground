@@ -1,12 +1,15 @@
-import LinkedListNode from "./LinkedListNode.ts";
+import DoublyLinkedListNode from "./DoublyLinkedListNode.ts";
 
-class LinkedList<T> {
+class DoublyLinkedList<T> {
   /** 头指针 */
-  head?: LinkedListNode<T>;
+  head?: DoublyLinkedListNode<T>;
   /** 尾指针 */
-  tail?: LinkedListNode<T>;
+  tail?: DoublyLinkedListNode<T>;
   prepend(value: T) {
-    const node = new LinkedListNode(value, this.head);
+    const node = new DoublyLinkedListNode(value, this.head);
+    if (this.head) {
+      this.head.pre = node;
+    }
     this.head = node;
     if (this.tail === undefined) {
       this.tail = node;
@@ -14,17 +17,18 @@ class LinkedList<T> {
     return this;
   }
   append(value: T) {
-    const node = new LinkedListNode(value);
+    const node = new DoublyLinkedListNode(value);
     if (this.head === undefined) {
       this.head = node;
       this.tail = node;
       return this;
     }
+    node.pre = this.tail;
     this.tail.next = node;
     this.tail = node;
     return this;
   }
-  find(cb: (value: T) => boolean): LinkedListNode<T> | undefined {
+  find(cb: (value: T) => boolean): DoublyLinkedListNode<T> | undefined {
     let current = this.head;
     while(current) {
       if (cb(current.value)) {
@@ -34,26 +38,26 @@ class LinkedList<T> {
     }
     return undefined;
   }
-  delete(cb: (value: T) => boolean): LinkedListNode<T> | undefined {
+  delete(cb: (value: T) => boolean): DoublyLinkedListNode<T> | undefined {
     if (!this.head) {
       return undefined;
     }
 
-    let pre: LinkedListNode<T> | undefined = undefined;
     let current = this.head;
     while(current) {
       if (cb(current.value)) {
-        if (pre) {
-          pre.next = current.next;
+        if (current.pre) {
+          current.pre.next = current.next;
         } else {
           this.head = current.next;
         }
-        if (this.tail === current) {
-          this.tail === pre;
+        if (current.next) {
+          current.next.pre = current.pre;
+        } else {
+          this.tail === current.pre;
         }
         return current;
       }
-      pre = current;
       current = current.next;
     }
   }
@@ -69,4 +73,4 @@ class LinkedList<T> {
   }
 }
 
-export default LinkedList;
+export default DoublyLinkedList;
